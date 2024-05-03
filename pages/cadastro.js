@@ -1,48 +1,47 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import React from 'react';
 import * as Animatable from 'react-native-animatable';
 import { Ionicons } from '@expo/vector-icons/'
 import { useNavigation } from '@react-navigation/native';
-import {StatusBar} from 'react-native';
+import { StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
 
 
-export default function Acesso() {
+
+export default function Cadastro() {
 
     const navigation = useNavigation();
-    const [email, salvarEmail] = useState('');
-    const [senha, salvarSenha] = useState('');
+    const [email, salvarEmail] = useState("");
+    const [senha, salvarSenha] = useState("");
 
-    async function loginRealizado() {
+    async function salvarItem() {
         try {
-            
-            const userData = await AsyncStorage.getItem('userData')
-            const {email: emailSalvo, senha: senhaSalva} = JSON.parse(userData);
-            if (email == emailSalvo && senha == senhaSalva){
-                alert('Login realizado com sucesso')
-            }else {
-                alert('Login inválido')
+            if (senha === "" || email === "") {
+                alert("Preencha todos os campos")
+                return;
+            } else {
+                await AsyncStorage.setItem('userData', JSON.stringify({ email, senha }))
+                salvarEmail();
+                salvarSenha();
+                alert("Cadasro realizado!")
+                console.log(email, senha)
+                
             }
-            return JSON.parse(userData) || [];
-        }
-
-        catch (erro) {
-            alert("Erro ao realizar login", erro)
-            return [];
+        } catch (erro) {
+            alert("Erro ao salvar as informações", erro)
         }
     }
-
 
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }}>
             <StatusBar barStyle="light" translucent={true} backgroundColor="#880000" />
             <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                <View style={styles.container} >                 
+                <View style={styles.container} >
                     <Animatable.View animation="fadeInLeft" delay={500} style={styles.containerHeader}>
-                        <Ionicons size={25} color={"#fff"} style={styles.volta} name="chevron-back-outline" onPress={() => navigation.navigate('index')}/>
-                        <Text style={styles.message}>Bem-vindo(a)</Text>
+                        <Ionicons size={25} color={"#fff"} style={styles.volta} name="chevron-back-outline" onPress={() => navigation.navigate('index')} />
+                        <Text style={styles.message}>Cadastre-se</Text>
                     </Animatable.View>
                     <Animatable.View animation="fadeInUp" style={styles.containerForm}>
                         <Text style={styles.title}>
@@ -55,22 +54,18 @@ export default function Acesso() {
                             onChangeText={salvarEmail}
                         />
                         <TextInput
-                            placeholder='Sua senha'
+                            placeholder='Digte uma senha'
                             style={styles.input}
-                            value={senha}
                             secureTextEntry
+                            value={senha}
                             onChangeText={salvarSenha}
                         />
-                        <TouchableOpacity style={styles.button} onPress={loginRealizado}>
+                        <TouchableOpacity style={styles.button} onPress={salvarItem}>
                             <Text style={styles.buttonText}>
-                                Acessar
+                                Cadastrar
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonRegister} onPress={() => navigation.navigate('cadastro')}>
-                            <Text style={styles.registerText} >
-                                Não possui uma conta? Cadastre-se
-                            </Text>
-                        </TouchableOpacity>
+
                     </Animatable.View>
                 </View>
             </TouchableWithoutFeedback>
@@ -92,8 +87,8 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: 'bold',
         color: "#FFF",
-        marginLeft:30,
-        marginTop:20
+        marginLeft: 30,
+        marginTop: 20
     },
     containerForm: {
         backgroundColor: "#FFF",
@@ -127,12 +122,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold'
     },
-    buttonRegister: {
-        marginTop: 14,
-        alignSelf: 'center'
-    },
-    registerText: {
-        color: '#a1a1a1'
-    },
+
 
 })
